@@ -1,5 +1,6 @@
 // Imports at the top of the file!
 // We never nest imports inside blocks of code!
+import axios from 'axios'
 
 
 // 👉 TASK 1- Test out the following endpoints:
@@ -16,10 +17,17 @@
 //  * With Chrome and the Network Tab
 //  * With JS using the native fetch [STRETCH]
 
+/*
+
+CRUD - Create | Read | Update | Delete
+HTTP - POST   | GET  |  PUT   | DELETE
+
+*/
+
 
 // 👉 TASK 2- Select the "entry point", the element
 // inside of which we'll inject our dog cards 
-const entryPoint = null
+const entryPoint = document.querySelector('div.entry')
 
 
 // 👉 TASK 3- `dogCardMaker` takes an object and returns a Dog Card.
@@ -45,10 +53,20 @@ function dogCardMaker({ imageURL, breed }) {
   return dogCard
 }
 
+const exampleDog = {
+  imageURL: 'https://cdn.pixabay.com/photo/2017/09/25/13/12/dog-2785074__340.jpg',
+  breed: 'Cocker Spaniel'
+}
+
+const exampleCard = dogCardMaker(exampleDog)
+
+// entryPoint.appendChild(exampleCard)
+
 
 // 👉 TASK 4- Bring the Axios library into the project using one of two methods:
 //    * Traditional way: put another script tag inside index.html (`https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js`)
 //    * Projects with npm: install it with npm and import it into this file
+
 
 
 // 👉 TASK 5- Fetch dogs from `https://dog.ceo/api/breed/{breed}/images/random/{number}`
@@ -60,9 +78,38 @@ function dogCardMaker({ imageURL, breed }) {
 // 👉 (OPTIONAL) TASK 6- Wrap the fetching operation inside a function `getDogs`
 // that takes a breed and a count (of dogs)
 
+const getDogs = (breed) => {
+  axios.get(`https://dog.ceo/api/breed/${breed}/images/random/1`)
+  .then(({data}) => {
+    const imageURL = data.message[0]
+    const newCard = dogCardMaker({imageURL, breed})
+    entryPoint.appendChild(newCard)
+  })
+  .catch(err => console.log(err))
+}
+
+// getDogs('mastiff')
+
 
 // 👉 (OPTIONAL) TASK 7- Put a button in index.html to 'get dogs' and add a click
 // event listener that executes `getDogs`
+const button = document.querySelector('#get-dogs-btn')
+button.addEventListener('click', () => {
+  // make a call for breeds
+  axios.get('https://lambda-times-api.herokuapp.com/breeds')
+  .then(({data}) => {
+    const breeds = data
+    breeds.forEach(breed => {
+      if(breed == 'cocker') {
+        return undefined
+      }
+      getDogs(breed)
+    })
+    entryPoint.appendChild(exampleCard)
+  })
+  .catch(err => console.log(err))
+})
+
 
 
 // 👉 (OPTIONAL) TASK 8- Import the breeds from `breeds.js`
